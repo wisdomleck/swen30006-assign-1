@@ -20,7 +20,7 @@ public class Automail {
     	/** Initialize robots */
     	robots = new Robot[numRobots];
     	charge = new Charge(modem, 0.224, 5.9);
-    	for (int i = 0; i < numRobots; i++) robots[i] = new Robot(delivery, mailPool, i);
+    	for (int i = 0; i < numRobots; i++) robots[i] = new Robot(delivery, mailPool, i, charge);
     }
     
 }

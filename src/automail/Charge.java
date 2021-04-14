@@ -10,6 +10,9 @@ public class Charge {
 	
 	private double activityUnitPrice;
 	
+	// The values we need to print out
+	private double activityUnits;
+	private double serviceFee;
 	private double markUp;
 	
 	private WifiModem modem;
@@ -22,6 +25,7 @@ public class Charge {
 		this.activityUnitPrice = activityUnitPrice;
 		this.markUp = markUp;
 		this.modem = modem;
+		this.activityUnits = 0;
 		//this.chargeThreshold = chargeThreshold;
 	}
 	
@@ -36,10 +40,42 @@ public class Charge {
 	}
 	
 	
-	// Calculates the charge of the mail when its still in the automail
-	public double calculateCharge(int endFloor) {
-		// pre-computes cost assuming 0.1 activity units max and we precompute this during mail pickup
-		return ((activityUnitMult*(Math.abs(endFloor-1)) + 0.1)*this.activityUnitPrice + this.modem.forwardCallToAPI_LookupPrice(endFloor)) * (1 + this.markUp);
+	// setters
+	// Updates the number of activity units in the current charge
+	public void addActivityUnits(double units) {
+		this.activityUnits += units;
+	}
+	
+	// pings the BMS to get a service fee
+	public void pingServiceFee(int floor) {
+		this.serviceFee = this.modem.forwardCallToAPI_LookupPrice(floor);
+		// cost of pinging servicefee
+		this.activityUnits += 0.1;
+	}
+	
+	
+	// Resets the charge for a new delivery
+	public void resetCharges() {
+		this.serviceFee = 0;
+		this.activityUnits = 0;
+	}
+	
+	
+	// Getters for the charge metrics
+	public double getActivityUnits() {
+		return this.activityUnits;
+	}
+	
+	public double getServiceFee(int floor) {
+		return this.serviceFee;
+	}
+	
+	public double getTotalCost() {
+		return this.serviceFee + this.activityUnits*this.activityUnitPrice;
+	}
+	
+	public double getTotalCharge() {
+		return (this.serviceFee + this.activityUnits*this.activityUnitPrice)*this.markUp;
 	}
 	
 }

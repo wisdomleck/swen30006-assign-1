@@ -19,6 +19,8 @@ public class MailItem {
     /** The weight in grams of the mail item */
     protected final int weight;
     
+    private Charge chargeObject;
+    
     // Every item can have a chargeThreshold
     //protected final int chargeThreshold;
 
@@ -33,6 +35,7 @@ public class MailItem {
         this.id = String.valueOf(hashCode());
         this.arrival_time = arrival_time;
         this.weight = weight;
+        
     }
 
     @Override

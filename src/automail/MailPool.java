@@ -6,6 +6,8 @@ import java.util.ListIterator;
 
 import exceptions.ItemTooHeavyException;
 
+import com.unimelb.swen30006.wifimodem.WifiModem;
+
 /**
  * addToPool is called when there are mail items newly arrived at the building to add to the MailPool or
  * if a robot returns with some undelivered items - these are added back to the MailPool.
@@ -13,7 +15,11 @@ import exceptions.ItemTooHeavyException;
  * 
  */
 public class MailPool {
-
+	
+	// Need to precompute the charge values before dispatching for priority
+	private Charge chargeObject;
+	
+	
 	private class Item {
 		int destination;
 		MailItem mailItem;

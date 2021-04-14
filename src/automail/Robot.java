@@ -6,6 +6,8 @@ import simulation.Building;
 import simulation.Clock;
 import simulation.IMailDelivery;
 
+import com.unimelb.swen30006.wifimodem.WifiModem;
+
 /**
  * The robot delivers mail!
  */
@@ -20,6 +22,11 @@ public class Robot {
     public RobotState current_state;
     private int current_floor;
     private int destination_floor;
+    
+    // keep track of the last floor where the robot picked up the packages, or just dropped one off
+    private int prev_floor;
+    
+    
     private MailPool mailPool;
     private boolean receivedDispatch;
     
@@ -29,6 +36,9 @@ public class Robot {
     
     private int deliveryCounter;
     
+    // Robot needs to charge the item on delivery
+    private Charge chargeObject;
+    
 
     /**
      * Initiates the robot's location at the start to be at the mailroom
@@ -37,7 +47,7 @@ public class Robot {
      * @param delivery governs the final delivery
      * @param mailPool is the source of mail items
      */
-    public Robot(IMailDelivery delivery, MailPool mailPool, int number){
+    public Robot(IMailDelivery delivery, MailPool mailPool, int number, Charge chargeObject){
     	this.id = "R" + number;
         // current_state = RobotState.WAITING;
     	current_state = RobotState.RETURNING;
@@ -46,6 +56,8 @@ public class Robot {
         this.mailPool = mailPool;
         this.receivedDispatch = false;
         this.deliveryCounter = 0;
+        
+        this.chargeObject = chargeObject;
     }
     
     /**
@@ -85,24 +97,25 @@ public class Robot {
                 	deliveryCounter = 0; // reset delivery counter
                 	setDestination();
                 	changeState(RobotState.DELIVERING);
+                	
+                	// Can only be waiting in the mailroom floor
+                	this.prev_floor = Building.MAILROOM_LOCATION;
                 }
                 break;
     		case DELIVERING:
     			if(current_floor == destination_floor){ // If already here drop off either way
-    				/** We should add the extra charge feature somewhere here
-    				 * - Need to keep track of the previous floor 
-    				 * - We need to look up the service fee from the BMS
-    				 * - 0.1 for looking up service fee
-    				 * - multiply by markup percentage
-    				 * - multiply activity units by 0.224 AUD
-    				 * - need charge threshold variable
-    				 * - MAKE A NEW CHARGE CLASS
-    				 */
+   
     				
                     /** Delivery complete, report this to the simulator! */
                     delivery.deliver(deliveryItem);
                     deliveryItem = null;
                     deliveryCounter++;
+          
+                    // Update charge
+                    chargeObject.pingServiceFee(current_floor);
+                    chargeObject.addActivityUnits(Math.abs(this.current_floor-this.prev_floor)*5);
+                    
+                    
                     if(deliveryCounter > 2){  // Implies a simulation bug
                     	throw new ExcessiveDeliveryException();
                     }
@@ -116,6 +129,9 @@ public class Robot {
                         tube = null;
                         setDestination();
                         changeState(RobotState.DELIVERING);
+                        
+                        // another delivery
+                        this.prev_floor = this.current_floor;
                     }
     			} else {
 	        		/** The robot is not at the destination yet, move towards it! */
@@ -160,7 +176,8 @@ public class Robot {
     	}
     	current_state = nextState;
     	if(nextState == RobotState.DELIVERING){
-            System.out.printf("T: %3d > %7s-> [%s]%n", Clock.Time(), getIdTube(), deliveryItem.toString());
+            //System.out.printf("T: %3d > %7s-> [%s]%n", Clock.Time(), getIdTube(), deliveryItem.toString());         
+    		System.out.printf("T: %3d > %7s-> [%s]%n", Clock.Time(), getIdTube(), deliveryItem.toString());    
     	}
     }
 
