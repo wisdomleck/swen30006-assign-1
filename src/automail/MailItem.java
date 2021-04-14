@@ -18,6 +18,9 @@ public class MailItem {
     protected final int arrival_time;
     /** The weight in grams of the mail item */
     protected final int weight;
+    
+    // Every item can have a chargeThreshold
+    //protected final int chargeThreshold;
 
     /**
      * Constructor for a MailItem

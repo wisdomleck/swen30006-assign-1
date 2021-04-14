@@ -69,12 +69,14 @@ public class Simulation {
 			mException.printStackTrace();
 		}
         
+        
+
         /**
          * This code section is for running a simulation
          */
         /* Instantiate MailPool and Automail */
      	MailPool mailPool = new MailPool(NUM_ROBOTS);
-        Automail automail = new Automail(mailPool, new ReportDelivery(), NUM_ROBOTS);
+        Automail automail = new Automail(mailPool, new ReportDelivery(), NUM_ROBOTS, wModem);
         MailGenerator mailGenerator = new MailGenerator(MAIL_TO_CREATE, MAIL_MAX_WEIGHT, mailPool, seedMap);
         
         /** Generate all the mails */
