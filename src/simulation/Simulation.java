@@ -98,6 +98,7 @@ public class Simulation {
         }
         printResults();
         System.out.println(wModem.Turnoff());
+        System.out.println(mailPool.getCharge().getStats().toString());
     }
     
     static private Properties setUpProperties() throws IOException {

@@ -11,10 +11,9 @@ public class Charge {
 	private double activityUnitPrice;
 	
 	// The values we need to print out
-	private double activityUnits;
-	private double serviceFee;
+	private double serviceFee = 0;
 	private double markUp;
-	
+	private StatsLog stats;
 	private WifiModem modem;
 	
 	//private boolean isPrio = false;
@@ -25,14 +24,27 @@ public class Charge {
 		this.activityUnitPrice = activityUnitPrice;
 		this.markUp = markUp;
 		this.modem = modem;
-		//this.serviceFee = 0;
-		//this.activityUnits = 0;
-		//this.chargeThreshold = chargeThreshold;
+		this.stats = new StatsLog();
 	}
 	
-	public String toString(int floor){
+	public String bill(MailItem mailItem){
+		int floor = mailItem.getDestFloor();
+		double charge = this.getCharge(floor);
+		double cost = this.getCost(floor);
+		double serviceFee = this.serviceFee;
+		double activityCost = this.getActivityCost(floor);
+		
+		this.stats.logDelivery();
+		this.stats.logActivityCost(activityCost);
+		this.stats.logServiceCost(serviceFee);
+		this.stats.logActivityUnits((activityUnitMult*(floor-1) + 0.1));
+		
 		return String.format("Charge: %4f | Cost: %2f | Fee: %4f | Activity: %4f", 
-				this.getCharge(floor), this.getCost(floor), this.serviceFee, this.getActivityCost(floor));
+				charge, cost, serviceFee, activityCost);
+	}
+	
+	public StatsLog getStats() {
+		return this.stats;
 	}
 	
 	// Updates the configurable markup percentage
@@ -46,11 +58,16 @@ public class Charge {
 	}
 	
 	public void setServiceFee(int floor) {
-		this.serviceFee = this.modem.forwardCallToAPI_LookupPrice(floor);
+		double serviceFee = this.modem.forwardCallToAPI_LookupPrice(floor);
+		this.stats.logLookUp();
+		if (serviceFee >= 0) {
+			this.serviceFee = serviceFee;
+			this.stats.logSuccessfulLookUp();
+		}
 	}
 	
 	public double getActivityCost(int floor) {
-		return this.activityUnitPrice*(5*(floor-1) + 0.1);
+		return this.activityUnitPrice*(activityUnitMult*(floor-1) + 0.1);
 	}
 	
 	public double getServiceFee() {

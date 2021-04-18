@@ -87,6 +87,9 @@ public class Robot {
         			/** Tell the sorter the robot is ready */
         			mailPool.registerWaiting(this);
                 	changeState(RobotState.WAITING);
+                	
+                	/** Returns chargeObject */
+                	this.chargeObject = null;
                 } else {
                 	/** If the robot is not at the mailroom floor yet, then move towards it! */
                     moveTowards(Building.MAILROOM_LOCATION);
@@ -109,7 +112,7 @@ public class Robot {
    
     				
                     /** Delivery complete, report this to the simulator! */
-                    delivery.deliver(deliveryItem, chargeObject.toString(current_floor));
+                    delivery.deliver(deliveryItem, chargeObject.bill(deliveryItem));
                     deliveryItem = null;
                     deliveryCounter++;
           

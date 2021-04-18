@@ -19,14 +19,13 @@ public class MailPool {
 	// mailpool should have a charge object and should pass it to robots when they are assigned delivery
 	private Charge chargeObject;
 	
-	
 	private class Item {
-		int destination;
+		double charge;
 		MailItem mailItem;
 		// Use stable sort to keep arrival time relative positions
 		
 		public Item(MailItem mailItem) {
-			destination = mailItem.getDestFloor();
+			this.charge = chargeObject.getCharge(mailItem.getDestFloor());
 			this.mailItem = mailItem;
 		}
 	}
@@ -35,9 +34,9 @@ public class MailPool {
 		@Override
 		public int compare(Item i1, Item i2) {
 			int order = 0;
-			if (i1.destination < i2.destination) {
+			if (i1.charge < i2.charge) {
 				order = 1;
-			} else if (i1.destination > i2.destination) {
+			} else if (i1.charge > i2.charge) {
 				order = -1;
 			}
 			return order;
@@ -46,7 +45,10 @@ public class MailPool {
 	
 	private LinkedList<Item> pool;
 	private LinkedList<Robot> robots;
-
+	
+	public Charge getCharge() {
+		return this.chargeObject;
+	}
 	public MailPool(int nrobots, WifiModem wModem){
 		// Start empty
 		this.chargeObject = new Charge(wModem, 0.224, 0.059);
@@ -63,7 +65,6 @@ public class MailPool {
 		pool.add(item);
 		pool.sort(new ItemComparator());
 	}
-	
 	
 	
 	/**
