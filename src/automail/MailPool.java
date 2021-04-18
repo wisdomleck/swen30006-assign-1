@@ -49,9 +49,9 @@ public class MailPool {
 	public Charge getCharge() {
 		return this.chargeObject;
 	}
-	public MailPool(int nrobots, WifiModem wModem){
+	public MailPool(int nrobots, WifiModem wModem, boolean chargeDisplayed){
 		// Start empty
-		this.chargeObject = new Charge(wModem, 0.224, 0.059);
+		this.chargeObject = new Charge(wModem, 0.224, 0.059, chargeDisplayed);
 		pool = new LinkedList<Item>();
 		robots = new LinkedList<Robot>();
 	}

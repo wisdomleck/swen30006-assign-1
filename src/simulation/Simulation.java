@@ -75,7 +75,8 @@ public class Simulation {
          * This code section is for running a simulation
          */
         /* Instantiate MailPool and Automail */
-     	MailPool mailPool = new MailPool(NUM_ROBOTS, wModem);
+        boolean chargeDisplayed = Boolean.parseBoolean(automailProperties.getProperty("ChargeDisplay"));
+     	MailPool mailPool = new MailPool(NUM_ROBOTS, wModem, chargeDisplayed);
         Automail automail = new Automail(mailPool, new ReportDelivery(), NUM_ROBOTS);
         MailGenerator mailGenerator = new MailGenerator(MAIL_TO_CREATE, MAIL_MAX_WEIGHT, mailPool, seedMap);
         
@@ -97,8 +98,8 @@ public class Simulation {
             Clock.Tick();
         }
         printResults();
-        System.out.println(wModem.Turnoff());
-        System.out.println(mailPool.getCharge().getStats().toString());
+        wModem.Turnoff();
+        System.out.print(mailPool.getCharge().getStats());
     }
     
     static private Properties setUpProperties() throws IOException {
@@ -153,7 +154,7 @@ public class Simulation {
     	public void deliver(MailItem deliveryItem, String charges){
     		if(!MAIL_DELIVERED.contains(deliveryItem)){
     			MAIL_DELIVERED.add(deliveryItem);
-                System.out.printf("T: %3d > Delivered(%4d) [%s | %s]%n", Clock.Time(), MAIL_DELIVERED.size(), deliveryItem.toString(), charges);
+                System.out.printf("T: %3d > Delivered(%4d) [%s%s]%n", Clock.Time(), MAIL_DELIVERED.size(), deliveryItem.toString(), charges);
     			// Calculate delivery score
     			total_delay += calculateDeliveryDelay(deliveryItem);
     		}

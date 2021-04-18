@@ -8,9 +8,8 @@ public class Charge {
 	/** Details about a Charge **/
 	private final static double activityUnitMult = 5;
 	
+	private boolean isOn;
 	private double activityUnitPrice;
-	
-	// The values we need to print out
 	private double serviceFee = 0;
 	private double markUp;
 	private StatsLog stats;
@@ -20,31 +19,38 @@ public class Charge {
 	//private double chargeThreshold;
 	
 	
-	public Charge(WifiModem modem, double activityUnitPrice, double markUp) {
+	public Charge(WifiModem modem, double activityUnitPrice, double markUp, boolean isOn) {
 		this.activityUnitPrice = activityUnitPrice;
 		this.markUp = markUp;
 		this.modem = modem;
 		this.stats = new StatsLog();
+		this.isOn = isOn;
 	}
 	
 	public String bill(MailItem mailItem){
-		int floor = mailItem.getDestFloor();
-		double charge = this.getCharge(floor);
-		double cost = this.getCost(floor);
-		double serviceFee = this.serviceFee;
-		double activityCost = this.getActivityCost(floor);
-		
-		this.stats.logDelivery();
-		this.stats.logActivityCost(activityCost);
-		this.stats.logServiceCost(serviceFee);
-		this.stats.logActivityUnits((activityUnitMult*(floor-1) + 0.1));
-		
-		return String.format("Charge: %4f | Cost: %2f | Fee: %4f | Activity: %4f", 
-				charge, cost, serviceFee, activityCost);
+		if (this.isOn) {
+			int floor = mailItem.getDestFloor();
+			double charge = this.getCharge(floor);
+			double cost = this.getCost(floor);
+			double serviceFee = this.serviceFee;
+			double activityCost = this.getActivityCost(floor);
+			
+			this.stats.logDelivery();
+			this.stats.logActivityCost(activityCost);
+			this.stats.logServiceCost(serviceFee);
+			this.stats.logActivityUnits((activityUnitMult*(floor-1) + 0.1));
+			
+			return String.format(" | Charge: %4f | Cost: %2f | Fee: %4f | Activity: %4f", 
+					charge, cost, serviceFee, activityCost);
+		}
+		return "";
 	}
 	
-	public StatsLog getStats() {
-		return this.stats;
+	public String getStats() {
+		if (this.isOn) {
+			return this.stats.toString();
+		}
+		return "";
 	}
 	
 	// Updates the configurable markup percentage
@@ -79,8 +85,11 @@ public class Charge {
 	}
 	
 	public double getCharge(int floor) {
-		this.setServiceFee(floor);
-		return this.getCost(floor)*(1+this.markUp);
+		if (this.isOn) {
+			this.setServiceFee(floor);
+			return this.getCost(floor)*(1+this.markUp);
+		}
+		return 0;
 	}
 
 	
