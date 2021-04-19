@@ -8,23 +8,27 @@ public class Charge {
 	/** Details about a Charge **/
 	private final static double activityUnitMult = 5;
 	
-	private boolean isOn;
+	private boolean isOn = false;
 	private double activityUnitPrice;
 	private double serviceFee = 0;
 	private double markUp;
 	private StatsLog stats;
 	private WifiModem modem;
+	private double threshold;
 	
 	//private boolean isPrio = false;
 	//private double chargeThreshold;
 	
 	
-	public Charge(WifiModem modem, double activityUnitPrice, double markUp, boolean isOn) {
+	public Charge(WifiModem modem, double activityUnitPrice, double markUp, boolean isOn, double threshold) {
 		this.activityUnitPrice = activityUnitPrice;
 		this.markUp = markUp;
 		this.modem = modem;
 		this.stats = new StatsLog();
-		this.isOn = isOn;
+		this.threshold = threshold;
+		if (threshold > 0) {
+			this.isOn = isOn;
+		}
 	}
 	
 	public String bill(MailItem mailItem){
@@ -90,6 +94,10 @@ public class Charge {
 			return this.getCost(floor)*(1+this.markUp);
 		}
 		return 0;
+	}
+
+	public double getThreshold() {
+		return this.threshold;
 	}
 
 	

@@ -76,7 +76,10 @@ public class Simulation {
          */
         /* Instantiate MailPool and Automail */
         boolean chargeDisplayed = Boolean.parseBoolean(automailProperties.getProperty("ChargeDisplay"));
-     	MailPool mailPool = new MailPool(NUM_ROBOTS, wModem, chargeDisplayed);
+        double markUpPercentage = Double.parseDouble(automailProperties.getProperty("markUpPercentage"));
+        double activityUnitPrice = Double.parseDouble(automailProperties.getProperty("activityUnitPrice"));
+        double chargeThreshold = Double.parseDouble(automailProperties.getProperty("ChargeThreshold"));
+        MailPool mailPool = new MailPool(NUM_ROBOTS, wModem, chargeDisplayed, markUpPercentage, activityUnitPrice, chargeThreshold);
         Automail automail = new Automail(mailPool, new ReportDelivery(), NUM_ROBOTS);
         MailGenerator mailGenerator = new MailGenerator(MAIL_TO_CREATE, MAIL_MAX_WEIGHT, mailPool, seedMap);
         
@@ -110,6 +113,8 @@ public class Simulation {
     	automailProperties.setProperty("Mail_to_Create", "80");
     	automailProperties.setProperty("ChargeThreshold", "0");
     	automailProperties.setProperty("ChargeDisplay", "false");
+    	automailProperties.setProperty("markUpPercentage", "0.059");
+    	automailProperties.setProperty("activityUnitPrice", "0.224");
     	
     	// Read properties
 		FileReader inStream = null;

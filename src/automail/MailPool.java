@@ -21,12 +21,15 @@ public class MailPool {
 	
 	private class Item {
 		double charge;
+		double destination;
 		MailItem mailItem;
 		// Use stable sort to keep arrival time relative positions
 		
 		public Item(MailItem mailItem) {
 			this.charge = chargeObject.getCharge(mailItem.getDestFloor());
+			this.destination = mailItem.getDestFloor();
 			this.mailItem = mailItem;
+			
 		}
 	}
 	
@@ -34,12 +37,22 @@ public class MailPool {
 		@Override
 		public int compare(Item i1, Item i2) {
 			int order = 0;
-			if (i1.charge < i2.charge) {
-				order = 1;
-			} else if (i1.charge > i2.charge) {
-				order = -1;
+			if (chargeObject.getThreshold() > 0) {
+				if (i1.charge < i2.charge) {
+					order = 1;
+				} else if (i1.charge > i2.charge) {
+					order = -1;
+				}
+				return order;
 			}
-			return order;
+			else {
+				if (i1.destination < i2.destination) {
+					order = 1;
+				} else if (i1.destination > i2.destination) {
+					order = -1;
+				}
+				return order;
+			}
 		}
 	}
 	
@@ -49,9 +62,9 @@ public class MailPool {
 	public Charge getCharge() {
 		return this.chargeObject;
 	}
-	public MailPool(int nrobots, WifiModem wModem, boolean chargeDisplayed){
+	public MailPool(int nrobots, WifiModem wModem, boolean chargeDisplayed, double markUpPercentage, double activityUnitPrice, double threshold){
 		// Start empty
-		this.chargeObject = new Charge(wModem, 0.224, 0.059, chargeDisplayed);
+		this.chargeObject = new Charge(wModem, activityUnitPrice, markUpPercentage, chargeDisplayed, threshold);
 		pool = new LinkedList<Item>();
 		robots = new LinkedList<Robot>();
 	}

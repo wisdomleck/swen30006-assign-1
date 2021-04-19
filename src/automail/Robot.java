@@ -24,9 +24,6 @@ public class Robot {
     private int current_floor;
     private int destination_floor;
     
-    // keep track of the last floor where the robot picked up the packages, or just dropped one off
-    private int prev_floor;
-    
     
     private MailPool mailPool;
     private boolean receivedDispatch;
@@ -103,8 +100,6 @@ public class Robot {
                 	setDestination();
                 	changeState(RobotState.DELIVERING);
                 	
-                	// Can only be waiting in the mailroom floor
-                	this.prev_floor = Building.MAILROOM_LOCATION;
                 }
                 break;
     		case DELIVERING:
@@ -134,9 +129,6 @@ public class Robot {
                         tube = null;
                         setDestination();
                         changeState(RobotState.DELIVERING);
-                        
-                        // another delivery
-                        this.prev_floor = this.current_floor;
                     }
     			} else {
 	        		/** The robot is not at the destination yet, move towards it! */
